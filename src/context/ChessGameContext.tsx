@@ -3,6 +3,11 @@ import { Chess, Square } from 'chess.js';
 import { GameStatus, GameOutcomeWinner, MoveRecord, GameSession } from '../types/gameTypes';
 import { StockfishService } from '../services/engine/stockfishService';
 import { soundService } from '../services/audio/soundService';
+import { RuleEngine } from '../services/classifier/ruleEngine';
+import { DatabaseService } from '../services/db/databaseService';
+import { HabitMiner } from '../services/mining/habitMiner';
+import { Diagnosis } from '../services/classifier/ruleTypes';
+import { HabitCandidate } from '../services/mining/habitTypes';
 
 interface ChessGameContextType {
   game: Chess;
@@ -22,6 +27,8 @@ interface ChessGameContextType {
   undoMove: () => void;
   getEvaluation: () => number; // Centipawns relative to White
   gameSessions: GameSession[];
+  topAcuteLeak: HabitCandidate | null;
+  minedHabits: HabitCandidate[];
 }
 
 const ChessGameContext = createContext<ChessGameContextType | undefined>(undefined);
@@ -37,15 +44,22 @@ export function ChessGameProvider({ children }: { children: ReactNode }) {
   const [isEngineThinking, setIsEngineThinking] = useState<boolean>(false);
   const [currentEval, setCurrentEval] = useState<number>(0);
   const [gameSessions, setGameSessions] = useState<GameSession[]>([]);
+  const [topAcuteLeak, setTopAcuteLeak] = useState<HabitCandidate | null>(null);
+  const [minedHabits, setMinedHabits] = useState<HabitCandidate[]>([]);
 
   const stockfishRef = useRef<StockfishService | null>(null);
   const lastMoveTimeRef = useRef<number>(Date.now());
 
-  // Initialize Stockfish engine instance
+  // Initialize Stockfish engine instance and mine initial habits
   useEffect(() => {
     const engine = new StockfishService(stockfishElo);
     stockfishRef.current = engine;
     engine.init().catch(console.error);
+
+    // Initial habit mining scan
+    const summary = HabitMiner.mineHabits();
+    setTopAcuteLeak(summary.topAcuteLeak);
+    setMinedHabits(summary.minedHabits);
 
     return () => {
       engine.terminate();
@@ -199,7 +213,7 @@ export function ChessGameProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const saveCompletedSession = (
+  const saveCompletedSession = async (
     finalGame: Chess,
     status: GameStatus,
     winResult: GameOutcomeWinner,
@@ -215,6 +229,36 @@ export function ChessGameProvider({ children }: { children: ReactNode }) {
       pgn: finalGame.pgn(),
       moveHistory: finalHistory,
     };
+
+    // Run RuleEngine diagnoses on user moves
+    const diagnosesByMoveId = new Map<string, Diagnosis[]>();
+    finalHistory.forEach((m) => {
+      if (m.playerColor === userColor) {
+        const moveId = `${session.id}_m${m.moveNumber}_${m.playerColor}`;
+        const diagnoses = RuleEngine.diagnoseMove({
+          fenBefore: m.fenBefore,
+          fenAfter: m.fenAfter,
+          playedMoveSan: m.san,
+          playedMoveUci: m.uci,
+          playerColor: m.playerColor,
+          evalDropCp: Math.max(50, Math.abs(m.evalCentipawns || 0)),
+          timeSpentMs: m.timeSpentMs,
+          moveNumber: m.moveNumber,
+        });
+        if (diagnoses.length > 0) {
+          diagnosesByMoveId.set(moveId, diagnoses);
+        }
+      }
+    });
+
+    // Save to Database Service
+    await DatabaseService.saveGameSession(session, diagnosesByMoveId);
+
+    // Mine habits and update DNA telemetry
+    const summary = HabitMiner.mineHabits();
+    setTopAcuteLeak(summary.topAcuteLeak);
+    setMinedHabits(summary.minedHabits);
+
     setGameSessions((prev) => [session, ...prev]);
   };
 
@@ -279,6 +323,8 @@ export function ChessGameProvider({ children }: { children: ReactNode }) {
         undoMove,
         getEvaluation: () => currentEval,
         gameSessions,
+        topAcuteLeak,
+        minedHabits,
       }}
     >
       {children}
