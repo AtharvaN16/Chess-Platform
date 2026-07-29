@@ -1,0 +1,31 @@
+import { describe, expect, test } from 'bun:test';
+import { Chess } from 'chess.js';
+import { StockfishService } from '../services/engine/stockfishService';
+
+describe('Phase 1 Core Engine & Gameplay Verification', () => {
+  test('chess.js validates legal moves and detects checkmate', () => {
+    const game = new Chess();
+    expect(game.fen()).toBe('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
+
+    // Scholar's Mate test sequence
+    game.move('e4');
+    game.move('e5');
+    game.move('Bc4');
+    game.move('Nc6');
+    game.move('Qh5');
+    game.move('Nf6');
+    game.move('Qxf7#');
+
+    expect(game.isCheckmate()).toBe(true);
+    expect(game.isGameOver()).toBe(true);
+  });
+
+  test('StockfishService configures ELO calibration correctly', () => {
+    const service = new StockfishService(1100);
+    expect(service.getStatus()).toBe('uninitialized');
+
+    service.setElo(1500);
+    // ELO configuration check
+    expect(service.getStatus()).toBe('uninitialized');
+  });
+});

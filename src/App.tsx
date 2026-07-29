@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Chessboard } from 'react-chessboard';
-import { Chess } from 'chess.js';
+import { ChessGameProvider, useChessGameContext } from './context/ChessGameContext';
+import { StockfishEloSelector } from './components/play/StockfishEloSelector';
+import { ChessBoardView } from './components/board/ChessBoardView';
+import { GameControls } from './components/play/GameControls';
+import { MoveHistoryList } from './components/play/MoveHistoryList';
 import { 
   Play, 
   Eye, 
@@ -9,21 +12,18 @@ import {
   Brain, 
   ShieldWarning, 
   Lightning, 
-  Sparkle, 
-  ArrowCounterClockwise,
-  SlidersHorizontal,
   Trophy,
   CaretRight,
   Sun,
   Moon
 } from '@phosphor-icons/react';
 
-export default function App() {
+function MainLayout() {
   const [activeTab, setActiveTab] = useState<'play' | 'review' | 'progress'>('play');
-  const [game, setGame] = useState<Chess>(new Chess());
-  const [stockfishElo, setStockfishElo] = useState<number>(800);
-  const [estimatedRating] = useState<number>(850);
+  const [boardOrientation, setBoardOrientation] = useState<'white' | 'black'>('white');
   const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
+
+  const { gameSessions } = useChessGameContext();
 
   useEffect(() => {
     if (isDarkMode) {
@@ -33,9 +33,8 @@ export default function App() {
     }
   }, [isDarkMode]);
 
-  const handleResetBoard = () => {
-    const newGame = new Chess();
-    setGame(newGame);
+  const handleFlipBoard = () => {
+    setBoardOrientation((prev) => (prev === 'white' ? 'black' : 'white'));
   };
 
   return (
@@ -50,7 +49,7 @@ export default function App() {
             <h1 className="font-semibold text-sm tracking-tight flex items-center gap-2">
               Personal AI Chess Coach
               <span className="px-2 py-0.5 text-[10px] uppercase font-mono tracking-wider bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-full font-medium">
-                Offline Mode
+                Phase 1 Active
               </span>
             </h1>
             <p className="text-[11px] text-[var(--text-secondary)]">Diagnosing your thinking process, not just engine moves</p>
@@ -90,7 +89,7 @@ export default function App() {
               />
             )}
             <Eye className="w-3.5 h-3.5 relative z-10" weight="bold" />
-            <span className="relative z-10">Review</span>
+            <span className="relative z-10">Review ({gameSessions.length})</span>
           </button>
 
           <button
@@ -114,7 +113,7 @@ export default function App() {
         {/* Right Status & Theme Toggle */}
         <div className="flex items-center space-x-4">
           <div className="text-right hidden sm:block">
-            <div className="text-xs font-medium font-mono">Performance: {estimatedRating} ELO</div>
+            <div className="text-xs font-medium font-mono">Performance: 850 ELO</div>
             <div className="text-[10px] text-amber-500 dark:text-amber-400 font-medium flex items-center justify-end gap-1">
               <ShieldWarning className="w-3.5 h-3.5" weight="fill" />
               <span>Leak: Threat Scan</span>
@@ -143,104 +142,16 @@ export default function App() {
               transition={{ duration: 0.2 }}
               className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start my-auto"
             >
-              {/* Left Panel: Engine Strength & Game Controls */}
-              <div className="lg:col-span-4 space-y-6">
-                <div className="surface-card rounded-2xl p-6 space-y-6">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-sm font-semibold tracking-tight flex items-center gap-2">
-                      <SlidersHorizontal className="w-4 h-4 text-indigo-500" weight="bold" />
-                      Calibrated Stockfish Opponent
-                    </h2>
-                    <span className="text-xs font-mono px-2.5 py-1 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-md font-medium">
-                      {stockfishElo >= 3000 ? 'Uncapped / Max' : `${stockfishElo} ELO`}
-                    </span>
-                  </div>
-
-                  {/* Stockfish ELO Slider */}
-                  <div className="space-y-3">
-                    <div className="flex justify-between text-xs text-[var(--text-secondary)]">
-                      <span>Beginner (100)</span>
-                      <span className="font-semibold text-[var(--text-primary)]">Target ({stockfishElo})</span>
-                      <span>Max (3200+)</span>
-                    </div>
-                    <input
-                      type="range"
-                      min="100"
-                      max="3200"
-                      step="50"
-                      value={stockfishElo}
-                      onChange={(e) => setStockfishElo(Number(e.target.value))}
-                      className="w-full h-1.5 bg-[var(--bg-subtle)] rounded-lg appearance-none cursor-pointer accent-indigo-600"
-                    />
-                    <div className="flex gap-2 pt-1">
-                      {[700, 900, 1100, 1500, 3200].map((elo) => (
-                        <button
-                          key={elo}
-                          onClick={() => setStockfishElo(elo)}
-                          className={`flex-1 text-[11px] py-1 rounded-lg transition-all ${
-                            (elo === 3200 ? stockfishElo >= 3000 : stockfishElo === elo)
-                              ? 'bg-indigo-600 text-white font-medium shadow-sm'
-                              : 'bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                          }`}
-                        >
-                          {elo === 3200 ? 'Max' : elo}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="p-3.5 rounded-xl bg-[var(--bg-subtle)] text-xs text-[var(--text-secondary)] space-y-1">
-                    <div className="font-medium text-[var(--text-primary)] flex items-center gap-1.5">
-                      <Sparkle className="w-3.5 h-3.5 text-indigo-500" weight="fill" />
-                      Session Mode Active
-                    </div>
-                    <p className="text-[11px] leading-relaxed">
-                      Play multiple games in a row. Every move time and PGN is automatically saved for post-game cognitive analysis.
-                    </p>
-                  </div>
-
-                  <div className="flex space-x-3 pt-2">
-                    <button
-                      onClick={handleResetBoard}
-                      className="flex-1 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold flex items-center justify-center space-x-2 transition-all shadow-md shadow-indigo-600/20 active:scale-95"
-                    >
-                      <ArrowCounterClockwise className="w-3.5 h-3.5" weight="bold" />
-                      <span>New Game</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Cognitive Diagnostics Widget */}
-                <div className="surface-card rounded-2xl p-5 space-y-3">
-                  <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider font-mono">
-                    Active Cognitive Focus
-                  </h3>
-                  <div className="p-3.5 rounded-xl bg-amber-500/10 text-amber-900 dark:text-amber-300 space-y-1">
-                    <div className="text-xs font-semibold flex items-center gap-2">
-                      <ShieldWarning className="w-4 h-4 text-amber-500" weight="fill" />
-                      <span>Threat Scan Protocol</span>
-                    </div>
-                    <p className="text-[11px] leading-relaxed text-amber-800 dark:text-amber-400/90">
-                      Before making every move, ask: *"What is my opponent threatening with their last move?"*
-                    </p>
-                  </div>
-                </div>
+              {/* Left Column: Engine Selector & Game Controls */}
+              <div className="lg:col-span-5 space-y-6">
+                <StockfishEloSelector />
+                <GameControls onFlipBoard={handleFlipBoard} />
+                <MoveHistoryList />
               </div>
 
-              {/* Center/Right Panel: Interactive Chessboard */}
-              <div className="lg:col-span-8 flex flex-col items-center">
-                <div className="w-full max-w-[560px] aspect-square rounded-2xl overflow-hidden surface-card p-2">
-                  <Chessboard
-                    options={{
-                      position: game.fen(),
-                      darkSquareStyle: { backgroundColor: isDarkMode ? '#1E2337' : '#B58863' },
-                      lightSquareStyle: { backgroundColor: isDarkMode ? '#2D334D' : '#F0D9B5' },
-                      boardStyle: {
-                        borderRadius: '12px',
-                      },
-                    }}
-                  />
-                </div>
+              {/* Right Column: Interactive Board */}
+              <div className="lg:col-span-7 flex flex-col items-center">
+                <ChessBoardView boardOrientation={boardOrientation} isDarkMode={isDarkMode} />
               </div>
             </motion.div>
           )}
@@ -261,34 +172,37 @@ export default function App() {
                 <div className="space-y-2">
                   <h2 className="text-xl font-bold tracking-tight">Guided Metacognitive Review</h2>
                   <p className="text-sm text-[var(--text-secondary)] max-w-md mx-auto">
+                    Recorded Sessions: <strong className="text-indigo-500">{gameSessions.length}</strong>.
                     Before revealing Stockfish evaluation lines, identify where you think your decision-making process failed.
                   </p>
                 </div>
 
-                <div className="p-6 rounded-2xl bg-[var(--bg-subtle)] text-left max-w-xl mx-auto space-y-4">
-                  <div className="flex items-center justify-between text-xs text-[var(--text-secondary)] font-mono">
-                    <span>Move 16 • White</span>
-                    <span className="text-red-500 font-semibold">Critical Turning Point</span>
+                {gameSessions.length === 0 ? (
+                  <div className="p-6 rounded-2xl bg-[var(--bg-subtle)] text-xs text-[var(--text-secondary)] italic">
+                    Play a game vs Stockfish to save session logs for review.
                   </div>
-                  <p className="text-sm font-medium">
-                    "You played <code className="bg-[var(--bg-base)] px-1.5 py-0.5 rounded text-indigo-600 dark:text-indigo-400 font-mono">16. Nd4</code>. Where do you think you went wrong?"
-                  </p>
+                ) : (
+                  <div className="p-6 rounded-2xl bg-[var(--bg-subtle)] text-left max-w-xl mx-auto space-y-4">
+                    <div className="flex items-center justify-between text-xs text-[var(--text-secondary)] font-mono">
+                      <span>Latest Session • {gameSessions[0].stockfishElo} ELO Stockfish</span>
+                      <span className="text-indigo-500 font-semibold">{gameSessions[0].moveHistory.length} moves</span>
+                    </div>
+                    <p className="text-sm font-medium">
+                      "Session completed with result: <code className="bg-[var(--bg-base)] px-1.5 py-0.5 rounded text-indigo-600 dark:text-indigo-400 font-mono">{gameSessions[0].status}</code>. Where do you think your thinking process failed?"
+                    </p>
 
-                  <div className="grid grid-cols-1 gap-2 pt-2">
-                    <button className="p-3.5 text-left rounded-xl bg-[var(--bg-surface)] hover:bg-indigo-500/5 text-xs text-[var(--text-primary)] transition-all flex items-center justify-between group">
-                      <span>I missed my opponent's direct attack on my Queen</span>
-                      <CaretRight className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-indigo-500 transition-colors" weight="bold" />
-                    </button>
-                    <button className="p-3.5 text-left rounded-xl bg-[var(--bg-surface)] hover:bg-indigo-500/5 text-xs text-[var(--text-primary)] transition-all flex items-center justify-between group">
-                      <span>I moved a piece that was defending another piece (LPDO)</span>
-                      <CaretRight className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-indigo-500 transition-colors" weight="bold" />
-                    </button>
-                    <button className="p-3.5 text-left rounded-xl bg-[var(--bg-surface)] hover:bg-indigo-500/5 text-xs text-[var(--text-primary)] transition-all flex items-center justify-between group">
-                      <span>I made a quick impulse move without calculating replies</span>
-                      <CaretRight className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-indigo-500 transition-colors" weight="bold" />
-                    </button>
+                    <div className="grid grid-cols-1 gap-2 pt-2">
+                      <button className="p-3.5 text-left rounded-xl bg-[var(--bg-surface)] hover:bg-indigo-500/5 text-xs text-[var(--text-primary)] transition-all flex items-center justify-between group">
+                        <span>I missed my opponent's direct threat (Threat Scan Failure)</span>
+                        <CaretRight className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-indigo-500 transition-colors" weight="bold" />
+                      </button>
+                      <button className="p-3.5 text-left rounded-xl bg-[var(--bg-surface)] hover:bg-indigo-500/5 text-xs text-[var(--text-primary)] transition-all flex items-center justify-between group">
+                        <span>I left a loose piece undefended (Safety Scan Failure)</span>
+                        <CaretRight className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-indigo-500 transition-colors" weight="bold" />
+                      </button>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </motion.div>
           )}
@@ -319,7 +233,7 @@ export default function App() {
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 font-mono">
                     <div className="p-4 rounded-xl bg-[var(--bg-subtle)] text-center">
                       <div className="text-[10px] text-[var(--text-secondary)] uppercase">Performance ELO</div>
-                      <div className="text-xl font-bold mt-1">{estimatedRating}</div>
+                      <div className="text-xl font-bold mt-1">850</div>
                     </div>
                     <div className="p-4 rounded-xl bg-[var(--bg-subtle)] text-center">
                       <div className="text-[10px] text-[var(--text-secondary)] uppercase">Tactical Strength</div>
@@ -361,16 +275,6 @@ export default function App() {
                         <div className="h-full bg-emerald-500 rounded-full" style={{ width: '78%' }} />
                       </div>
                     </div>
-
-                    <div className="space-y-1.5">
-                      <div className="flex justify-between">
-                        <span>Candidate Move Generation</span>
-                        <span className="text-indigo-500 font-semibold">65%</span>
-                      </div>
-                      <div className="h-2 rounded-full bg-[var(--bg-subtle)] overflow-hidden">
-                        <div className="h-full bg-indigo-500 rounded-full" style={{ width: '65%' }} />
-                      </div>
-                    </div>
                   </div>
                 </div>
 
@@ -390,10 +294,6 @@ export default function App() {
                       <span>Delays Castling Past Move 15</span>
                       <span className="font-mono text-amber-500 font-bold">74%</span>
                     </div>
-                    <div className="p-3.5 rounded-xl bg-[var(--bg-subtle)] flex items-center justify-between">
-                      <span>Moves Queen Early</span>
-                      <span className="font-mono text-[var(--text-secondary)] font-bold">61%</span>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -402,5 +302,13 @@ export default function App() {
         </AnimatePresence>
       </main>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <ChessGameProvider>
+      <MainLayout />
+    </ChessGameProvider>
   );
 }
