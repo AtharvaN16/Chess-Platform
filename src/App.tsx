@@ -5,18 +5,18 @@ import { Chess } from 'chess.js';
 import { 
   Play, 
   Eye, 
-  TrendingUp, 
+  TrendUp, 
   Brain, 
-  ShieldAlert, 
-  Zap, 
-  Sparkles, 
-  RotateCcw,
-  Sliders,
-  Award,
-  ChevronRight,
+  ShieldWarning, 
+  Lightning, 
+  Sparkle, 
+  ArrowCounterClockwise,
+  SlidersHorizontal,
+  Trophy,
+  CaretRight,
   Sun,
   Moon
-} from 'lucide-react';
+} from '@phosphor-icons/react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'play' | 'review' | 'progress'>('play');
@@ -44,7 +44,7 @@ export default function App() {
       <header className="h-16 surface-panel sticky top-0 z-50 px-6 flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center shadow-md shadow-indigo-600/20">
-            <Brain className="w-5 h-5 text-white" />
+            <Brain className="w-5 h-5 text-white" weight="bold" />
           </div>
           <div>
             <h1 className="font-semibold text-sm tracking-tight flex items-center gap-2">
@@ -72,7 +72,7 @@ export default function App() {
                 transition={{ type: 'spring', stiffness: 400, damping: 30 }}
               />
             )}
-            <Play className="w-3.5 h-3.5 relative z-10" />
+            <Play className="w-3.5 h-3.5 relative z-10" weight="bold" />
             <span className="relative z-10">Play</span>
           </button>
 
@@ -89,7 +89,7 @@ export default function App() {
                 transition={{ type: 'spring', stiffness: 400, damping: 30 }}
               />
             )}
-            <Eye className="w-3.5 h-3.5 relative z-10" />
+            <Eye className="w-3.5 h-3.5 relative z-10" weight="bold" />
             <span className="relative z-10">Review</span>
           </button>
 
@@ -106,7 +106,7 @@ export default function App() {
                 transition={{ type: 'spring', stiffness: 400, damping: 30 }}
               />
             )}
-            <TrendingUp className="w-3.5 h-3.5 relative z-10" />
+            <TrendUp className="w-3.5 h-3.5 relative z-10" weight="bold" />
             <span className="relative z-10">Progress</span>
           </button>
         </nav>
@@ -116,7 +116,7 @@ export default function App() {
           <div className="text-right hidden sm:block">
             <div className="text-xs font-medium font-mono">Performance: {estimatedRating} ELO</div>
             <div className="text-[10px] text-amber-500 dark:text-amber-400 font-medium flex items-center justify-end gap-1">
-              <ShieldAlert className="w-3 h-3" />
+              <ShieldWarning className="w-3.5 h-3.5" weight="fill" />
               <span>Leak: Threat Scan</span>
             </div>
           </div>
@@ -126,7 +126,7 @@ export default function App() {
             className="p-2 rounded-xl bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
             title="Toggle Light/Dark Theme"
           >
-            {isDarkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-indigo-600" />}
+            {isDarkMode ? <Sun className="w-4 h-4 text-amber-400" weight="bold" /> : <Moon className="w-4 h-4 text-indigo-600" weight="bold" />}
           </button>
         </div>
       </header>
@@ -148,7 +148,7 @@ export default function App() {
                 <div className="surface-card rounded-2xl p-6 space-y-6">
                   <div className="flex items-center justify-between">
                     <h2 className="text-sm font-semibold tracking-tight flex items-center gap-2">
-                      <Sliders className="w-4 h-4 text-indigo-500" />
+                      <SlidersHorizontal className="w-4 h-4 text-indigo-500" weight="bold" />
                       Calibrated Stockfish Opponent
                     </h2>
                     <span className="text-xs font-mono px-2.5 py-1 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-md font-medium">
@@ -191,7 +191,7 @@ export default function App() {
 
                   <div className="p-3.5 rounded-xl bg-[var(--bg-subtle)] text-xs text-[var(--text-secondary)] space-y-1">
                     <div className="font-medium text-[var(--text-primary)] flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
+                      <Sparkle className="w-3.5 h-3.5 text-indigo-500" weight="fill" />
                       Session Mode Active
                     </div>
                     <p className="text-[11px] leading-relaxed">
@@ -204,7 +204,7 @@ export default function App() {
                       onClick={handleResetBoard}
                       className="flex-1 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold flex items-center justify-center space-x-2 transition-all shadow-md shadow-indigo-600/20 active:scale-95"
                     >
-                      <RotateCcw className="w-3.5 h-3.5" />
+                      <ArrowCounterClockwise className="w-3.5 h-3.5" weight="bold" />
                       <span>New Game</span>
                     </button>
                   </div>
@@ -217,7 +217,7 @@ export default function App() {
                   </h3>
                   <div className="p-3.5 rounded-xl bg-amber-500/10 text-amber-900 dark:text-amber-300 space-y-1">
                     <div className="text-xs font-semibold flex items-center gap-2">
-                      <ShieldAlert className="w-4 h-4 text-amber-500" />
+                      <ShieldWarning className="w-4 h-4 text-amber-500" weight="fill" />
                       <span>Threat Scan Protocol</span>
                     </div>
                     <p className="text-[11px] leading-relaxed text-amber-800 dark:text-amber-400/90">
@@ -256,7 +256,7 @@ export default function App() {
             >
               <div className="surface-card rounded-2xl p-8 space-y-6 text-center">
                 <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-500 flex items-center justify-center mx-auto">
-                  <Eye className="w-6 h-6" />
+                  <Eye className="w-6 h-6" weight="bold" />
                 </div>
                 <div className="space-y-2">
                   <h2 className="text-xl font-bold tracking-tight">Guided Metacognitive Review</h2>
@@ -277,15 +277,15 @@ export default function App() {
                   <div className="grid grid-cols-1 gap-2 pt-2">
                     <button className="p-3.5 text-left rounded-xl bg-[var(--bg-surface)] hover:bg-indigo-500/5 text-xs text-[var(--text-primary)] transition-all flex items-center justify-between group">
                       <span>I missed my opponent's direct attack on my Queen</span>
-                      <ChevronRight className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-indigo-500 transition-colors" />
+                      <CaretRight className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-indigo-500 transition-colors" weight="bold" />
                     </button>
                     <button className="p-3.5 text-left rounded-xl bg-[var(--bg-surface)] hover:bg-indigo-500/5 text-xs text-[var(--text-primary)] transition-all flex items-center justify-between group">
                       <span>I moved a piece that was defending another piece (LPDO)</span>
-                      <ChevronRight className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-indigo-500 transition-colors" />
+                      <CaretRight className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-indigo-500 transition-colors" weight="bold" />
                     </button>
                     <button className="p-3.5 text-left rounded-xl bg-[var(--bg-surface)] hover:bg-indigo-500/5 text-xs text-[var(--text-primary)] transition-all flex items-center justify-between group">
                       <span>I made a quick impulse move without calculating replies</span>
-                      <ChevronRight className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-indigo-500 transition-colors" />
+                      <CaretRight className="w-4 h-4 text-[var(--text-secondary)] group-hover:text-indigo-500 transition-colors" weight="bold" />
                     </button>
                   </div>
                 </div>
@@ -307,7 +307,7 @@ export default function App() {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
                   <div className="space-y-2">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-xs font-mono font-medium">
-                      <Award className="w-3.5 h-3.5" />
+                      <Trophy className="w-3.5 h-3.5" weight="bold" />
                       <span>Personal Chess DNA Profile</span>
                     </div>
                     <h2 className="text-2xl font-bold tracking-tight">The Counter-Puncher</h2>
@@ -337,7 +337,7 @@ export default function App() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="surface-card rounded-2xl p-6 space-y-4">
                   <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider font-mono flex items-center gap-2">
-                    <Zap className="w-4 h-4 text-indigo-500" />
+                    <Lightning className="w-4 h-4 text-indigo-500" weight="bold" />
                     Cognitive Thinking Steps
                   </h3>
 
@@ -377,7 +377,7 @@ export default function App() {
                 {/* Behavioral Metrics Dashboard */}
                 <div className="surface-card rounded-2xl p-6 space-y-4">
                   <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider font-mono flex items-center gap-2">
-                    <ShieldAlert className="w-4 h-4 text-amber-500" />
+                    <ShieldWarning className="w-4 h-4 text-amber-500" weight="fill" />
                     Mined Behavioral Habits
                   </h3>
 
