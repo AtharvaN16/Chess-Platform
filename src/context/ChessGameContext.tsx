@@ -13,6 +13,7 @@ interface ChessGameContextType {
   gameStatus: GameStatus;
   winner: GameOutcomeWinner;
   moveHistory: MoveRecord[];
+  lastMove: { from: string; to: string } | null;
   isEngineThinking: boolean;
   makeMove: (sourceSquare: string, targetSquare: string) => boolean;
   resetGame: () => void;
@@ -32,6 +33,7 @@ export function ChessGameProvider({ children }: { children: ReactNode }) {
   const [gameStatus, setGameStatus] = useState<GameStatus>('playing');
   const [winner, setWinner] = useState<GameOutcomeWinner>(null);
   const [moveHistory, setMoveHistory] = useState<MoveRecord[]>([]);
+  const [lastMove, setLastMove] = useState<{ from: string; to: string } | null>(null);
   const [isEngineThinking, setIsEngineThinking] = useState<boolean>(false);
   const [currentEval, setCurrentEval] = useState<number>(0);
   const [gameSessions, setGameSessions] = useState<GameSession[]>([]);
@@ -116,12 +118,21 @@ export function ChessGameProvider({ children }: { children: ReactNode }) {
 
     try {
       const gameCopy = new Chess(game.fen());
-      const moveResult = gameCopy.move({
+
+      // Only pass promotion property if moving a pawn to promotion rank (rank 8 or 1)
+      const movingPiece = gameCopy.get(from);
+      const isPawnPromotion =
+        movingPiece &&
+        movingPiece.type === 'p' &&
+        ((movingPiece.color === 'w' && to[1] === '8') || (movingPiece.color === 'b' && to[1] === '1'));
+
+      const moveConfig = {
         from,
         to,
-        promotion: promotion || 'q',
-      });
+        ...(isPawnPromotion ? { promotion: promotion || 'q' } : {}),
+      };
 
+      const moveResult = gameCopy.move(moveConfig);
       if (!moveResult) return false;
 
       // Play appropriate sound effect
@@ -148,6 +159,7 @@ export function ChessGameProvider({ children }: { children: ReactNode }) {
       };
 
       setGame(gameCopy);
+      setLastMove({ from, to });
       setMoveHistory((prev) => [...prev, record]);
 
       // Check game completion status
@@ -200,6 +212,7 @@ export function ChessGameProvider({ children }: { children: ReactNode }) {
     setGameStatus('playing');
     setWinner(null);
     setMoveHistory([]);
+    setLastMove(null);
     setCurrentEval(0);
     lastMoveTimeRef.current = Date.now();
   };
@@ -228,6 +241,7 @@ export function ChessGameProvider({ children }: { children: ReactNode }) {
 
     setGame(gameCopy);
     setMoveHistory((prev) => prev.slice(0, -2));
+    setLastMove(null);
     setGameStatus('playing');
     setWinner(null);
     lastMoveTimeRef.current = Date.now();
@@ -244,6 +258,7 @@ export function ChessGameProvider({ children }: { children: ReactNode }) {
         gameStatus,
         winner,
         moveHistory,
+        lastMove,
         isEngineThinking,
         makeMove,
         resetGame,

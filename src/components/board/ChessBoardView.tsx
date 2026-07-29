@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, CSSProperties } from 'react';
 import { Chessboard } from 'react-chessboard';
+import { Square } from 'chess.js';
 import { useChessGame } from '../../hooks/useChessGame';
 import { CircleNotch, Trophy, Handshake, Flag } from '@phosphor-icons/react';
 
@@ -9,23 +10,24 @@ interface ChessBoardViewProps {
 }
 
 export function ChessBoardView({ boardOrientation, isDarkMode }: ChessBoardViewProps) {
-  const { game, makeMove, isEngineThinking, gameStatus, winner, getEvaluation, userColor } = useChessGame();
+  const { game, makeMove, isEngineThinking, gameStatus, winner, getEvaluation, userColor, lastMove } = useChessGame();
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
 
   const onSquareClick = (square: string) => {
     if (gameStatus !== 'playing') return;
 
     if (!selectedSquare) {
-      const piece = game.get(square as Parameters<typeof game.get>[0]);
+      const piece = game.get(square as Square);
       if (piece && piece.color === game.turn()) {
         setSelectedSquare(square);
       }
     } else {
+      // Attempt move from selectedSquare to target square
       const success = makeMove(selectedSquare, square);
       setSelectedSquare(null);
       if (!success) {
-        // If clicking another friendly piece, switch selection
-        const piece = game.get(square as Parameters<typeof game.get>[0]);
+        // If clicking another friendly piece, switch selection to that piece
+        const piece = game.get(square as Square);
         if (piece && piece.color === game.turn()) {
           setSelectedSquare(square);
         }
@@ -38,6 +40,35 @@ export function ChessBoardView({ boardOrientation, isDarkMode }: ChessBoardViewP
     setSelectedSquare(null);
     return makeMove(sourceSquare, targetSquare);
   };
+
+  // Build custom square styles for selected square, legal moves, and last move
+  const squareStyles: Record<string, CSSProperties> = {};
+
+  // 1. Highlight last move (from & to squares)
+  if (lastMove) {
+    squareStyles[lastMove.from] = { backgroundColor: 'rgba(251, 191, 36, 0.25)' };
+    squareStyles[lastMove.to] = { backgroundColor: 'rgba(251, 191, 36, 0.35)' };
+  }
+
+  // 2. Highlight selected square & legal destination moves
+  if (selectedSquare) {
+    squareStyles[selectedSquare] = { backgroundColor: 'rgba(99, 102, 241, 0.5)' };
+
+    try {
+      const moves = game.moves({ square: selectedSquare as Square, verbose: true });
+      moves.forEach((move) => {
+        const isCapture = Boolean(move.captured);
+        squareStyles[move.to] = {
+          background: isCapture
+            ? 'radial-gradient(circle, rgba(239, 68, 68, 0.6) 30%, transparent 30%)'
+            : 'radial-gradient(circle, rgba(99, 102, 241, 0.5) 25%, transparent 25%)',
+          borderRadius: '50%',
+        };
+      });
+    } catch {
+      // Ignore move lookup errors if square is invalid
+    }
+  }
 
   // Evaluation centipawn score to percentage mapping (-1000 to +1000 CP)
   const evalCp = getEvaluation();
@@ -91,6 +122,7 @@ export function ChessBoardView({ boardOrientation, isDarkMode }: ChessBoardViewP
               boardOrientation,
               onPieceDrop: handlePieceDrop,
               onSquareClick: ({ square }) => onSquareClick(square),
+              squareStyles,
               darkSquareStyle: { backgroundColor: isDarkMode ? '#1E2337' : '#B58863' },
               lightSquareStyle: { backgroundColor: isDarkMode ? '#2D334D' : '#F0D9B5' },
               boardStyle: {
