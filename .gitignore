@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+.bun/
+bun.lockb
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# IDE & OS
+.DS_Store
+.vscode/
+.idea/
+
+# Ignored Folders (Skills, User Assets, Docs per user rules)
+skills/
+.agents/
+assets/
+docs/
