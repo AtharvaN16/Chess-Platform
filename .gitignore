@@ -13,8 +13,10 @@ build/
 .vscode/
 .idea/
 
-# Ignored Folders (Skills, User Assets, Docs per user rules)
+# User-Provided Assets (Ignored per user rules)
+user-assets/
+
+# Ignored Folders (Skills & Docs per user rules)
 skills/
 .agents/
-assets/
 docs/
