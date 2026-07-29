@@ -36,14 +36,27 @@ export function ChessBoardView({ boardOrientation, isDarkMode }: ChessBoardViewP
     }
   };
 
-  // Drag-and-Drop Handler
-  const handlePieceDrop = ({ sourceSquare, targetSquare }: { sourceSquare: string; targetSquare: string | null }): boolean => {
-    if (gameStatus !== 'playing' || !targetSquare) return false;
-    setSelectedSquare(null);
-    return makeMove(sourceSquare, targetSquare);
+  // Piece Drag Handler: Instantly highlight origin square and legal destination moves while dragging
+  const handlePieceDrag = ({ square }: { square: string | null }) => {
+    if (gameStatus !== 'playing' || !square) return;
+    const piece = game.get(square as Square);
+    if (piece && piece.color === game.turn()) {
+      setSelectedSquare(square);
+    }
   };
 
-  // Build custom square styles for selected square, legal moves, and last move
+  // Drag-and-Drop Drop Handler
+  const handlePieceDrop = ({ sourceSquare, targetSquare }: { sourceSquare: string; targetSquare: string | null }): boolean => {
+    if (gameStatus !== 'playing' || !targetSquare) {
+      setSelectedSquare(null);
+      return false;
+    }
+    const success = makeMove(sourceSquare, targetSquare);
+    setSelectedSquare(null);
+    return success;
+  };
+
+  // Build custom square styles for selected/dragged square, legal moves, and last move
   const squareStyles: Record<string, CSSProperties> = {};
 
   // 1. Highlight last move (from & to squares)
@@ -52,7 +65,7 @@ export function ChessBoardView({ boardOrientation, isDarkMode }: ChessBoardViewP
     squareStyles[lastMove.to] = { backgroundColor: 'rgba(251, 191, 36, 0.35)' };
   }
 
-  // 2. Highlight selected square & legal destination moves
+  // 2. Highlight selected/dragged square & legal destination moves
   if (selectedSquare) {
     squareStyles[selectedSquare] = { backgroundColor: 'rgba(99, 102, 241, 0.5)' };
 
@@ -145,13 +158,14 @@ export function ChessBoardView({ boardOrientation, isDarkMode }: ChessBoardViewP
           />
         </div>
 
-        {/* Interactive Chessboard (Drag & Drop + Click Move Enabled) */}
+        {/* Interactive Chessboard (Drag & Drop + Click Move + Drag Highlights Enabled) */}
         <div className="flex-1 aspect-square rounded-2xl overflow-hidden surface-card p-2 relative">
           <Chessboard
             options={{
               position: game.fen(),
               boardOrientation,
               allowDragging: true,
+              onPieceDrag: handlePieceDrag,
               onPieceDrop: handlePieceDrop,
               onSquareClick: ({ square }) => onSquareClick(square),
               squareStyles,
