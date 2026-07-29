@@ -13,6 +13,7 @@ export function ChessBoardView({ boardOrientation, isDarkMode }: ChessBoardViewP
   const { game, makeMove, isEngineThinking, gameStatus, winner, getEvaluation, userColor, lastMove } = useChessGame();
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
 
+  // Click-to-Move Handler
   const onSquareClick = (square: string) => {
     if (gameStatus !== 'playing') return;
 
@@ -35,6 +36,7 @@ export function ChessBoardView({ boardOrientation, isDarkMode }: ChessBoardViewP
     }
   };
 
+  // Drag-and-Drop Handler
   const handlePieceDrop = ({ sourceSquare, targetSquare }: { sourceSquare: string; targetSquare: string | null }): boolean => {
     if (gameStatus !== 'playing' || !targetSquare) return false;
     setSelectedSquare(null);
@@ -64,6 +66,35 @@ export function ChessBoardView({ boardOrientation, isDarkMode }: ChessBoardViewP
             : 'radial-gradient(circle, rgba(99, 102, 241, 0.5) 25%, transparent 25%)',
           borderRadius: '50%',
         };
+
+        // Also highlight Rook squares for King castling (Chess.com & Lichess style)
+        if (selectedSquare === 'e1') {
+          if (move.to === 'g1') {
+            squareStyles['h1'] = {
+              background: 'radial-gradient(circle, rgba(99, 102, 241, 0.5) 25%, transparent 25%)',
+              borderRadius: '50%',
+            };
+          }
+          if (move.to === 'c1') {
+            squareStyles['a1'] = {
+              background: 'radial-gradient(circle, rgba(99, 102, 241, 0.5) 25%, transparent 25%)',
+              borderRadius: '50%',
+            };
+          }
+        } else if (selectedSquare === 'e8') {
+          if (move.to === 'g8') {
+            squareStyles['h8'] = {
+              background: 'radial-gradient(circle, rgba(99, 102, 241, 0.5) 25%, transparent 25%)',
+              borderRadius: '50%',
+            };
+          }
+          if (move.to === 'c8') {
+            squareStyles['a8'] = {
+              background: 'radial-gradient(circle, rgba(99, 102, 241, 0.5) 25%, transparent 25%)',
+              borderRadius: '50%',
+            };
+          }
+        }
       });
     } catch {
       // Ignore move lookup errors if square is invalid
@@ -114,12 +145,13 @@ export function ChessBoardView({ boardOrientation, isDarkMode }: ChessBoardViewP
           />
         </div>
 
-        {/* Interactive Chessboard */}
+        {/* Interactive Chessboard (Drag & Drop + Click Move Enabled) */}
         <div className="flex-1 aspect-square rounded-2xl overflow-hidden surface-card p-2 relative">
           <Chessboard
             options={{
               position: game.fen(),
               boardOrientation,
+              allowDragging: true,
               onPieceDrop: handlePieceDrop,
               onSquareClick: ({ square }) => onSquareClick(square),
               squareStyles,

@@ -107,20 +107,32 @@ export function ChessGameProvider({ children }: { children: ReactNode }) {
 
   const executeMove = (
     from: Square,
-    to: Square,
+    toSquare: Square,
     promotion?: string,
     evalCp?: number
   ): boolean => {
+    let to: Square = toSquare;
+    const gameCopy = new Chess(game.fen());
+    const movingPiece = gameCopy.get(from);
+
+    // Support Chess.com / Lichess King-onto-Rook castling input (e.g. e1 -> h1 or e1 -> a1)
+    if (movingPiece && movingPiece.type === 'k') {
+      if (from === 'e1') {
+        if (toSquare === 'h1') to = 'g1' as Square;
+        if (toSquare === 'a1') to = 'c1' as Square;
+      } else if (from === 'e8') {
+        if (toSquare === 'h8') to = 'g8' as Square;
+        if (toSquare === 'a8') to = 'c8' as Square;
+      }
+    }
+
     const fenBefore = game.fen();
     const now = Date.now();
     const timeSpentMs = now - lastMoveTimeRef.current;
     lastMoveTimeRef.current = now;
 
     try {
-      const gameCopy = new Chess(game.fen());
-
       // Only pass promotion property if moving a pawn to promotion rank (rank 8 or 1)
-      const movingPiece = gameCopy.get(from);
       const isPawnPromotion =
         movingPiece &&
         movingPiece.type === 'p' &&
