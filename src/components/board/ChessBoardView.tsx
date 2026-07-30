@@ -177,9 +177,9 @@ export function ChessBoardView({ boardOrientation, isDarkMode }: ChessBoardViewP
             }}
           />
 
-          {/* Game Over Modal Overlay */}
+          {/* Game Over Modal Overlay - Tone-on-tone zero glassmorphism */}
           {gameStatus !== 'playing' && (
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center space-y-4 rounded-2xl animate-fade-in">
+            <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-6 text-center space-y-4 rounded-2xl animate-fade-in">
               <div className="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
                 {gameStatus === 'checkmate' ? (
                   <Trophy className="w-6 h-6" weight="bold" />
@@ -200,7 +200,7 @@ export function ChessBoardView({ boardOrientation, isDarkMode }: ChessBoardViewP
                     : 'Game Drawn'}
                 </h3>
                 <p className="text-xs text-zinc-400">
-                  Game saved to local session log. Ready for guided cognitive review.
+                  Game saved to local session log. Ready for interactive game review.
                 </p>
               </div>
             </div>

@@ -43,8 +43,8 @@ function AppContent() {
   return (
     <div className={isDarkMode ? 'dark' : ''}>
       <div className="min-h-screen bg-[var(--bg-app)] text-[var(--text-primary)] transition-colors duration-200 flex flex-col">
-        {/* Header Bar */}
-        <header className="border-b border-[var(--border-subtle)] px-6 py-4 flex items-center justify-between">
+        {/* Header Bar - Tone-on-tone zero strokes */}
+        <header className="px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-indigo-500 flex items-center justify-center text-white font-bold text-sm shadow-md shadow-indigo-500/20">
               ♔
@@ -53,12 +53,12 @@ function AppContent() {
           </div>
 
           {/* Navigation Tabs */}
-          <nav className="flex items-center gap-1 p-1 rounded-xl bg-[var(--bg-surface)] text-xs">
+          <nav className="flex items-center gap-1 p-1 rounded-xl bg-[var(--bg-surface)] text-xs shadow-sm">
             <button
               onClick={() => setActiveTab('play')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg font-medium transition-all ${
                 activeTab === 'play'
-                  ? 'bg-[var(--bg-subtle)] text-[var(--text-primary)] shadow-sm'
+                  ? 'bg-[var(--bg-subtle)] text-[var(--text-primary)] font-semibold'
                   : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
@@ -68,9 +68,9 @@ function AppContent() {
 
             <button
               onClick={() => setActiveTab('games')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg font-medium transition-all ${
                 activeTab === 'games'
-                  ? 'bg-[var(--bg-subtle)] text-[var(--text-primary)] shadow-sm'
+                  ? 'bg-[var(--bg-subtle)] text-[var(--text-primary)] font-semibold'
                   : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
@@ -80,9 +80,9 @@ function AppContent() {
 
             <button
               onClick={() => setActiveTab('review')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg font-medium transition-all ${
                 activeTab === 'review'
-                  ? 'bg-[var(--bg-subtle)] text-[var(--text-primary)] shadow-sm'
+                  ? 'bg-[var(--bg-subtle)] text-[var(--text-primary)] font-semibold'
                   : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
@@ -92,9 +92,9 @@ function AppContent() {
 
             <button
               onClick={() => setActiveTab('progress')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-medium transition-all ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg font-medium transition-all ${
                 activeTab === 'progress'
-                  ? 'bg-[var(--bg-subtle)] text-[var(--text-primary)] shadow-sm'
+                  ? 'bg-[var(--bg-subtle)] text-[var(--text-primary)] font-semibold'
                   : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
@@ -107,7 +107,7 @@ function AppContent() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsSetupModalOpen(true)}
-              className="px-3 py-1.5 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white font-semibold text-xs flex items-center gap-1.5 shadow-md shadow-indigo-500/20 transition-all"
+              className="px-3.5 py-1.5 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white font-semibold text-xs flex items-center gap-1.5 shadow-md shadow-indigo-500/20 transition-all"
             >
               <Gear className="w-4 h-4" weight="bold" />
               <span>New Match Setup</span>
@@ -115,7 +115,7 @@ function AppContent() {
 
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-xl bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+              className="p-2 rounded-xl bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors shadow-sm"
               title="Toggle Light/Dark Theme"
             >
               {isDarkMode ? <Sun className="w-4 h-4" weight="bold" /> : <Moon className="w-4 h-4" weight="bold" />}

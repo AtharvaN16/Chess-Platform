@@ -46,17 +46,17 @@ export function MatchSetupModal({ isOpen, onClose, onStartMatch }: MatchSetupMod
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-fade-in">
-      <div className="surface-card rounded-2xl p-6 max-w-lg w-full space-y-6 shadow-2xl border border-[var(--border-subtle)]">
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50 animate-fade-in">
+      <div className="surface-card rounded-2xl p-6 max-w-lg w-full space-y-6 shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-4">
+        <div className="flex items-center justify-between pb-2">
           <div className="flex items-center gap-2 font-bold text-lg">
             <Robot className="w-6 h-6 text-indigo-500" weight="bold" />
             <span>Match Setup vs Stockfish</span>
           </div>
           <button
             onClick={onClose}
-            className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+            className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors p-1"
           >
             ✕
           </button>
@@ -70,10 +70,10 @@ export function MatchSetupModal({ isOpen, onClose, onStartMatch }: MatchSetupMod
           <div className="grid grid-cols-3 gap-3">
             <button
               onClick={() => setSelectedColor('w')}
-              className={`p-3 rounded-xl border flex flex-col items-center gap-1.5 transition-all ${
+              className={`p-3.5 rounded-xl flex flex-col items-center gap-1.5 transition-all ${
                 selectedColor === 'w'
-                  ? 'border-indigo-500 bg-indigo-500/10 font-bold text-indigo-500'
-                  : 'border-[var(--border-subtle)] bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                  ? 'bg-indigo-500/20 font-bold text-indigo-500 shadow-sm'
+                  : 'bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               <User className="w-5 h-5" weight="bold" />
@@ -82,10 +82,10 @@ export function MatchSetupModal({ isOpen, onClose, onStartMatch }: MatchSetupMod
 
             <button
               onClick={() => setSelectedColor('b')}
-              className={`p-3 rounded-xl border flex flex-col items-center gap-1.5 transition-all ${
+              className={`p-3.5 rounded-xl flex flex-col items-center gap-1.5 transition-all ${
                 selectedColor === 'b'
-                  ? 'border-indigo-500 bg-indigo-500/10 font-bold text-indigo-500'
-                  : 'border-[var(--border-subtle)] bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                  ? 'bg-indigo-500/20 font-bold text-indigo-500 shadow-sm'
+                  : 'bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               <User className="w-5 h-5 text-zinc-400" weight="bold" />
@@ -94,10 +94,10 @@ export function MatchSetupModal({ isOpen, onClose, onStartMatch }: MatchSetupMod
 
             <button
               onClick={() => setSelectedColor('random')}
-              className={`p-3 rounded-xl border flex flex-col items-center gap-1.5 transition-all ${
+              className={`p-3.5 rounded-xl flex flex-col items-center gap-1.5 transition-all ${
                 selectedColor === 'random'
-                  ? 'border-indigo-500 bg-indigo-500/10 font-bold text-indigo-500'
-                  : 'border-[var(--border-subtle)] bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                  ? 'bg-indigo-500/20 font-bold text-indigo-500 shadow-sm'
+                  : 'bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
               }`}
             >
               <Shuffle className="w-5 h-5" weight="bold" />
@@ -154,10 +154,10 @@ export function MatchSetupModal({ isOpen, onClose, onStartMatch }: MatchSetupMod
                 <button
                   key={tc.name}
                   onClick={() => setSelectedTimeControl(tc)}
-                  className={`p-2.5 rounded-xl border text-xs font-mono transition-all text-center ${
+                  className={`p-3 rounded-xl text-xs font-mono transition-all text-center ${
                     selectedTimeControl.name === tc.name
-                      ? 'border-indigo-500 bg-indigo-500/10 font-bold text-indigo-500'
-                      : 'border-[var(--border-subtle)] bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                      ? 'bg-indigo-500/20 font-bold text-indigo-500 shadow-sm'
+                      : 'bg-[var(--bg-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                   }`}
                 >
                   {tc.name}
@@ -165,27 +165,27 @@ export function MatchSetupModal({ isOpen, onClose, onStartMatch }: MatchSetupMod
               ))}
             </div>
           ) : (
-            <div className="p-3 rounded-xl bg-[var(--bg-subtle)] grid grid-cols-2 gap-3 text-xs">
+            <div className="p-3.5 rounded-xl bg-[var(--bg-subtle)] grid grid-cols-2 gap-3 text-xs">
               <div>
-                <label className="block text-[10px] text-[var(--text-secondary)] mb-1">Minutes</label>
+                <label className="block text-[10px] text-[var(--text-secondary)] mb-1 font-mono uppercase">Minutes</label>
                 <input
                   type="number"
                   min="1"
                   max="180"
                   value={customMinutes}
                   onChange={(e) => setCustomMinutes(Number(e.target.value))}
-                  className="w-full p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] font-mono text-xs"
+                  className="w-full p-2.5 rounded-lg bg-[var(--bg-surface)] font-mono text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
                 />
               </div>
               <div>
-                <label className="block text-[10px] text-[var(--text-secondary)] mb-1">Increment (sec)</label>
+                <label className="block text-[10px] text-[var(--text-secondary)] mb-1 font-mono uppercase">Increment (sec)</label>
                 <input
                   type="number"
                   min="0"
                   max="60"
                   value={customIncrement}
                   onChange={(e) => setCustomIncrement(Number(e.target.value))}
-                  className="w-full p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-subtle)] font-mono text-xs"
+                  className="w-full p-2.5 rounded-lg bg-[var(--bg-surface)] font-mono text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
                 />
               </div>
             </div>

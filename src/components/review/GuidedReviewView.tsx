@@ -112,8 +112,8 @@ export function GuidedReviewView({ selectedReviewSession, onBackToGamesLog }: Gu
 
         {/* Right Column: Review Panel with Commentary / Moves Tabs & Scrubber (5 cols) */}
         <div className="lg:col-span-5 surface-card rounded-2xl p-6 space-y-5 flex flex-col justify-between h-[540px]">
-          {/* Header Metadata Card (Matching Screenshot 2) */}
-          <div className="space-y-3 border-b border-[var(--border-subtle)] pb-4">
+          {/* Header Metadata Card */}
+          <div className="space-y-3 pb-2">
             <div className="flex items-center justify-between text-xs text-[var(--text-secondary)] font-mono">
               <span>Atharva • Wins as {session.userColor === 'w' ? 'White' : 'Black'}</span>
               <span className="text-emerald-500 font-bold">+59 (752)</span>
@@ -125,7 +125,7 @@ export function GuidedReviewView({ selectedReviewSession, onBackToGamesLog }: Gu
                 onClick={() => setActiveTab('commentary')}
                 className={`flex-1 py-1.5 rounded-lg font-medium transition-all flex items-center justify-center gap-1.5 ${
                   activeTab === 'commentary'
-                    ? 'bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm'
+                    ? 'bg-[var(--bg-surface)] text-[var(--text-primary)] font-semibold shadow-sm'
                     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
@@ -137,7 +137,7 @@ export function GuidedReviewView({ selectedReviewSession, onBackToGamesLog }: Gu
                 onClick={() => setActiveTab('moves')}
                 className={`flex-1 py-1.5 rounded-lg font-medium transition-all flex items-center justify-center gap-1.5 ${
                   activeTab === 'moves'
-                    ? 'bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-sm'
+                    ? 'bg-[var(--bg-surface)] text-[var(--text-primary)] font-semibold shadow-sm'
                     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                 }`}
               >
@@ -150,7 +150,7 @@ export function GuidedReviewView({ selectedReviewSession, onBackToGamesLog }: Gu
           {/* Body Content: Commentary Tab OR Moves Tab */}
           <div className="flex-1 overflow-y-auto">
             {activeTab === 'commentary' ? (
-              /* Commentary Tab Content (Matching Screenshot 2) */
+              /* Commentary Tab Content */
               <div className="space-y-4">
                 <div className="flex items-center justify-between text-xs">
                   <span className="px-2.5 py-1 rounded-lg bg-indigo-500/10 text-indigo-500 font-mono font-semibold flex items-center gap-1.5">
@@ -170,7 +170,7 @@ export function GuidedReviewView({ selectedReviewSession, onBackToGamesLog }: Gu
                 </div>
               </div>
             ) : (
-              /* Moves Tab Content (Matching Screenshot 1) */
+              /* Moves Tab Content */
               <div className="space-y-1 font-mono text-xs max-h-[220px] overflow-y-auto pr-1">
                 {moves.map((m, idx) => {
                   const evalVal = (m.evalCentipawns || 0) / 100;
@@ -181,9 +181,9 @@ export function GuidedReviewView({ selectedReviewSession, onBackToGamesLog }: Gu
                     <div
                       key={idx}
                       onClick={() => setActiveMoveIdx(idx)}
-                      className={`p-2 rounded-lg cursor-pointer flex items-center justify-between transition-colors ${
+                      className={`p-2.5 rounded-lg cursor-pointer flex items-center justify-between transition-colors ${
                         isCurrent
-                          ? 'bg-indigo-500/10 text-indigo-500 font-bold border border-indigo-500/30'
+                          ? 'bg-indigo-500/20 text-indigo-500 font-bold'
                           : 'hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)]'
                       }`}
                     >
@@ -199,8 +199,8 @@ export function GuidedReviewView({ selectedReviewSession, onBackToGamesLog }: Gu
             )}
           </div>
 
-          {/* Bottom Section: Sparkline Scrubber & Player Controls (Matching Screenshots 1 & 2) */}
-          <div className="space-y-4 border-t border-[var(--border-subtle)] pt-4">
+          {/* Bottom Section: Sparkline Scrubber & Player Controls */}
+          <div className="space-y-4 pt-2">
             <EvalSparklineScrubber
               moveHistory={moves}
               activeMoveIndex={activeMoveIdx}

@@ -16,7 +16,7 @@ export function GamesHistoryLogView({ onSelectGameForReview }: GamesHistoryLogVi
         <div>
           <h2 className="text-xl font-bold tracking-tight">Games Log History</h2>
           <p className="text-xs text-[var(--text-secondary)]">
-            Review past games, analyze mistakes with Stockfish, and inspect performance telemetry.
+            Review past games, analyze move quality with Stockfish, and inspect performance telemetry.
           </p>
         </div>
         <span className="text-xs font-mono px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-500 font-semibold">
@@ -57,17 +57,17 @@ export function GamesHistoryLogView({ onSelectGameForReview }: GamesHistoryLogVi
               <div
                 key={session.id}
                 onClick={() => onSelectGameForReview(session)}
-                className="surface-card rounded-2xl p-5 hover:bg-[var(--bg-subtle)] transition-all cursor-pointer group border border-[var(--border-subtle)] flex flex-col md:flex-row md:items-center justify-between gap-6"
+                className="surface-card rounded-2xl p-5 hover:bg-[var(--bg-subtle)] transition-all cursor-pointer group flex flex-col md:flex-row md:items-center justify-between gap-6"
               >
                 {/* Left Mini Board Thumbnail & Title */}
                 <div className="flex items-center gap-5">
                   <div
-                    className={`w-28 h-28 rounded-xl overflow-hidden p-1 shadow-md border-2 ${
+                    className={`w-28 h-28 rounded-xl overflow-hidden p-1 shadow-md bg-[var(--bg-subtle)] ${
                       isWin
-                        ? 'border-indigo-500 shadow-indigo-500/20'
+                        ? 'shadow-indigo-500/20'
                         : isDraw
-                        ? 'border-zinc-500'
-                        : 'border-red-500 shadow-red-500/20'
+                        ? ''
+                        : 'shadow-red-500/20'
                     }`}
                   >
                     <Chessboard
